@@ -56,16 +56,16 @@ export default function TeamDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const teamRes = await axios.get(`http://localhost:5000/api/teams/${teamId}`);
+        const teamRes = await axios.get(`https://appathon-backend.vercel.app/api/teams/${teamId}`);
         setTeamData(teamRes.data);
         if (teamRes.data.chosenProblem) {
             setChosenProblem(teamRes.data.chosenProblem);
         }
         
-        const statusRes = await axios.get('http://localhost:5000/api/admin/status');
+        const statusRes = await axios.get('https://appathon-backend.vercel.app/api/admin/status');
         setIsRevealed(statusRes.data.problemStatementRevealed);
 
-        const stateRes = await axios.get('http://localhost:5000/api/admin/state');
+        const stateRes = await axios.get('https://appathon-backend.vercel.app/api/admin/state');
         setAdminState(stateRes.data.state);
 
       } catch (err) {
@@ -84,7 +84,7 @@ export default function TeamDashboard() {
     const confirmChoice = window.confirm(`Are you sure you want to lock in Problem Statement #${problemId}? You cannot change this later.`);
     if (!confirmChoice) return;
     try {
-      await axios.post(`http://localhost:5000/api/teams/${teamId}/select-problem`, { chosenProblem: problemId });
+      await axios.post(`https://appathon-backend.vercel.app/api/teams/${teamId}/select-problem`, { chosenProblem: problemId });
       setChosenProblem(problemId);
       alert("Problem Statement Locked In Successfully!");
     } catch (error) {
@@ -95,7 +95,7 @@ export default function TeamDashboard() {
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://localhost:5000/api/teams/${teamId}/submit-project`, {
+      await axios.post(`https://appathon-backend.vercel.app/api/teams/${teamId}/submit-project`, {
         githubLink,
         deployLink
       });

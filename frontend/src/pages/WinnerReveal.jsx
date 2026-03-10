@@ -14,7 +14,7 @@ export default function WinnerReveal() {
   useEffect(() => {
     const fetchWinners = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/winners');
+        const res = await axios.get('https://appathon-backend.vercel.app/api/admin/winners');
         setWinners(res.data.winners);
       } catch (err) {
         console.error("Make sure marks are locked in Admin Panel!", err);

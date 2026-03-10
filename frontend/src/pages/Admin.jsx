@@ -6,11 +6,14 @@ export default function Admin() {
   const [teams, setTeams] = useState([]);
   const [state, setState] = useState({});
 
+  // 🚀 HARDCODED LIVE BACKEND URL - Fixes the localhost bug instantly!
+  const API_URL = 'https://appathon-backend.vercel.app';
+
   const fetchAdminData = async () => {
     try {
-      const resState = await axios.get('http://localhost:5000/api/admin/state').catch(() => ({ data: { state: {} } }));
-      const resTeams = await axios.get('http://localhost:5000/api/admin/teams').catch(() => ({ data: { teams: [] } }));
-      const resStatus = await axios.get('http://localhost:5000/api/admin/status').catch(() => ({ data: { problemStatementRevealed: false } }));
+      const resState = await axios.get(`${API_URL}/api/admin/state`).catch(() => ({ data: { state: {} } }));
+      const resTeams = await axios.get(`${API_URL}/api/admin/teams`).catch(() => ({ data: { teams: [] } }));
+      const resStatus = await axios.get(`${API_URL}/api/admin/status`).catch(() => ({ data: { problemStatementRevealed: false } }));
 
       setState({
         ...resState.data.state,
@@ -26,7 +29,7 @@ export default function Admin() {
 
   const toggleState = async (action, value) => {
     try {
-      await axios.put('http://localhost:5000/api/admin/state', { action, value });
+      await axios.put(`${API_URL}/api/admin/state`, { action, value });
       fetchAdminData();
     } catch (error) {
       console.error("Error updating state", error);
@@ -35,7 +38,7 @@ export default function Admin() {
 
   const handleRevealStatements = async () => {
     try {
-      await axios.post('http://localhost:5000/api/admin/reveal');
+      await axios.post(`${API_URL}/api/admin/reveal`);
       alert("Boom! 🚀 Problem Statements revealed to all teams!");
       fetchAdminData();
     } catch (error) {
@@ -45,7 +48,7 @@ export default function Admin() {
 
   const updateMarks = async (teamId, field, val) => {
     try {
-      await axios.put('http://localhost:5000/api/admin/marks', { teamId, [field]: val });
+      await axios.put(`${API_URL}/api/admin/marks`, { teamId, [field]: val });
       fetchAdminData();
     } catch (error) {
       console.error("Error updating marks", error);
@@ -54,7 +57,7 @@ export default function Admin() {
 
   const notifyTeam = async (teamId, round) => {
     try {
-      await axios.post(`http://localhost:5000/api/admin/notify/${teamId}`, { round });
+      await axios.post(`${API_URL}/api/admin/notify/${teamId}`, { round });
       fetchAdminData(); 
     } catch (error) {
       console.error("Error sending notification", error);
@@ -67,7 +70,7 @@ export default function Admin() {
     
     if (confirmText === "DELETE") {
       try {
-        await axios.delete('http://localhost:5000/api/admin/clear-teams');
+        await axios.delete(`${API_URL}/api/admin/clear-teams`);
         alert("Database wiped successfully! Starting fresh.");
         fetchAdminData(); 
       } catch (error) {
@@ -146,14 +149,11 @@ export default function Admin() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+        {/* --- REMOVED THE 4 EXTRA BUTTONS HERE --- */}
+        <div className="grid grid-cols-2 gap-4 mb-10 max-w-lg">
           {[
             { label: "Reveal Problem", key: "problemRevealed", customClick: handleRevealStatements },
-            { label: "R1 Evaluation", key: "round1Enabled" },
             { label: "Submissions", key: "submissionEnabled" },
-            { label: "Final Eval", key: "finalEnabled" },
-            { label: "Lock Marks", key: "marksLocked" },
-            { label: "Winner Reveal", key: "winnerRevealStarted" },
           ].map((btn) => (
             <button
               key={btn.key}
