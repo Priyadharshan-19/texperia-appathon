@@ -1,13 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const Team = require('../models/Team'); 
-const AdminState = require('../models/EventState'); // Fixed the path here!
+const EventState = require('../models/EventState');
 
-// GET Admin State (Only tracking submissionEnabled now)
+// 🛠️ BUG FIX: Helper function to guarantee ONLY ONE settings file exists
+const getEventState = async () => {
+  let state = await EventState.findOne();
+  if (!state) {
+    await EventState.deleteMany({}); // Wipe any glitchy duplicates
+    state = await EventState.create({});
+  }
+  return state;
+};
+
+// GET Admin State
 router.get('/state', async (req, res) => {
   try {
-    let state = await AdminState.findOne();
-    if (!state) state = await AdminState.create({});
+    const state = await getEventState();
     res.json({ state });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -18,9 +27,8 @@ router.get('/state', async (req, res) => {
 router.put('/state', async (req, res) => {
   try {
     const { action, value } = req.body;
-    let state = await AdminState.findOne();
+    const state = await getEventState();
     
-    // We only need to handle submissions now!
     if (action === 'submissionEnabled') {
       state.submissionEnabled = value;
     }
@@ -32,25 +40,26 @@ router.put('/state', async (req, res) => {
   }
 });
 
-// GET Status (Problem Statement Reveal Check)
+// GET Status (For the Team Dashboard)
 router.get('/status', async (req, res) => {
   try {
-    let state = await AdminState.findOne();
-    res.json({ problemStatementRevealed: state ? state.problemStatementRevealed : false });
+    const state = await getEventState();
+    res.json({ problemStatementRevealed: state.problemStatementRevealed });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// POST Reveal Problem Statements
+// POST Reveal Problem Statements (🚨 NOW A PERFECT TOGGLE!)
 router.post('/reveal', async (req, res) => {
   try {
-    let state = await AdminState.findOne();
-    if (!state) state = await AdminState.create({});
+    const state = await getEventState();
     
-    state.problemStatementRevealed = true;
+    // This now flips back and forth! (Locked -> Unlocked -> Locked)
+    state.problemStatementRevealed = !state.problemStatementRevealed;
     await state.save();
-    res.json({ message: 'Problem statements revealed!' });
+    
+    res.json({ message: 'Problem statements toggled successfully!' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -111,7 +120,7 @@ router.delete('/clear-teams', async (req, res) => {
   }
 });
 
-// GET Winners (Keeping this so your WinnerReveal.jsx page still works!)
+// GET Winners
 router.get('/winners', async (req, res) => {
   try {
     const teams = await Team.find().sort({ 'marks.total': -1 }).limit(3);

@@ -8,6 +8,11 @@ router.post('/register', async (req, res) => {
   try {
     const { teamName, password, leaderName, leaderContact, member1, member2, member3 } = req.body;
 
+    // 🚨 BUG FIX: Prevent server crash from missing data
+    if (!teamName || !password || !leaderName || !leaderContact) {
+      return res.status(400).json({ message: "Please fill in all required fields!" });
+    }
+
     // Check if team name already exists
     const existingTeam = await Team.findOne({ teamName });
     if (existingTeam) {
@@ -50,6 +55,11 @@ router.post('/login', async (req, res) => {
   try {
     const { teamName, password } = req.body;
 
+    // 🚨 BUG FIX: Prevent crash on empty login attempt
+    if (!teamName || !password) {
+      return res.status(400).json({ message: "Please provide both Team Name and Password." });
+    }
+
     const team = await Team.findOne({ teamName });
     if (!team) {
       return res.status(400).json({ message: "Team not found. Have you registered yet?" });
@@ -87,8 +97,13 @@ router.get('/:teamId', async (req, res) => {
 router.post('/:teamId/select-problem', async (req, res) => {
   try {
     const { chosenProblem } = req.body;
-    const team = await Team.findById(req.params.teamId);
+    
+    // 🚨 BUG FIX: Prevent locking in nothing
+    if (!chosenProblem) {
+      return res.status(400).json({ message: "No problem statement selected!" });
+    }
 
+    const team = await Team.findById(req.params.teamId);
     if (!team) return res.status(404).json({ message: "Team not found" });
     
     if (team.chosenProblem) {
@@ -110,8 +125,13 @@ router.post('/:teamId/select-problem', async (req, res) => {
 router.post('/:teamId/submit-project', async (req, res) => {
   try {
     const { githubLink, deployLink } = req.body;
-    const team = await Team.findById(req.params.teamId);
+    
+    // 🚨 BUG FIX: Prevent empty submissions
+    if (!githubLink) {
+      return res.status(400).json({ message: "GitHub link is required to submit!" });
+    }
 
+    const team = await Team.findById(req.params.teamId);
     if (!team) return res.status(404).json({ message: "Team not found" });
 
     // Save the submission
