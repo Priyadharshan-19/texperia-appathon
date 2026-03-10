@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Team = require('../models/Team'); // Make sure your path is correct
-const AdminState = require('../models/AdminState'); // Make sure your path is correct
+const Team = require('../models/Team'); 
+const AdminState = require('../models/EventState'); // Fixed the path here!
 
 // GET Admin State (Only tracking submissionEnabled now)
 router.get('/state', async (req, res) => {
