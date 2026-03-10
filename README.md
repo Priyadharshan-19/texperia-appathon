@@ -7,7 +7,7 @@
 ![Tailwind](https://img.shields.io/badge/UI-TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css)
 ![Vercel](https://img.shields.io/badge/Deployment-Vercel-black?style=for-the-badge&logo=vercel)
 
-A **full-stack real-time event management and judging platform** built for **APPATHON 2026** under **TEXPERIA 2K26** at **SNS College of Technology**.
+A **full-stack real-time event management and judging platform** built for **APPATHON 2026** for **TEXPERIA 2K26** at **SNS College of Technology**.
 
 The platform manages the **entire lifecycle of a hackathon**, from team login and problem statement reveal to project submission, judging, and a cinematic winner reveal experience.
 
